@@ -15,6 +15,7 @@ importmap = ImportMap(
     {
         "django-prose-editor/editor": "django_prose_editor/editor.js",
         "django-prose-editor/configurable": "django_prose_editor/configurable.js",
+        "django-prose-editor/codeblocklowlight": "django_prose_editor/codeblocklowlight.js",
     }
 )
 

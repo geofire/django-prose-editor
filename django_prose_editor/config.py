@@ -123,6 +123,15 @@ def process_code_block(config, shared_config):
     add_tags_and_attributes(shared_config, tags, attributes)
 
 
+def process_code_block_lowlight(config, shared_config):
+    """Process CodeBlockLowlight extension configuration.
+
+    The syntax highlighting only exists as editor decorations; the saved HTML
+    is ``<pre><code class="language-xyz">``.
+    """
+    add_tags_and_attributes(shared_config, ["pre", "code"], {"code": ["class"]})
+
+
 def process_figure(config, shared_config):
     """Process Figure extension configuration."""
     # Prepare tags and attributes
@@ -390,6 +399,25 @@ EXTENSION_MAPPING = {
     "Placeholder": html_tags([]),
 }
 
+# Extensions which live in their own JavaScript module because of their size. Loaded on demand.
+BUILTIN_EXTENSION_GROUPS = [
+    {
+        "js": ["django-prose-editor/codeblocklowlight"],
+        "extensions": {
+            "CodeBlockLowlight": process_code_block_lowlight,
+        },
+    },
+]
+
+
+def _extension_groups():
+    """Built-in extension groups followed by the user-defined ones."""
+    return [
+        *BUILTIN_EXTENSION_GROUPS,
+        *getattr(settings, "DJANGO_PROSE_EDITOR_EXTENSIONS", []),
+    ]
+
+
 # DEPRECATED: This dictionary is no longer used for automatic dependency management
 # but kept for backwards compatibility checking
 LEGACY_EXTENSION_DEPENDENCIES = {
@@ -502,8 +530,7 @@ def js_from_extensions(
     expanded = set(expand_extensions(extensions))
     js_modules = {}
 
-    extensions = getattr(settings, "DJANGO_PROSE_EDITOR_EXTENSIONS", [])
-    for group in extensions:
+    for group in _extension_groups():
         if (js := group.get("js")) and expanded & group["extensions"].keys():
             # str() resolves lazy strings such as ``static_lazy`` paths.
             js_modules.update((str(path), None) for path in js)
@@ -541,15 +568,14 @@ def allowlist_from_extensions(
         "attributes": {},
     }
 
-    extensions = getattr(settings, "DJANGO_PROSE_EDITOR_EXTENSIONS", [])
     processors = EXTENSION_MAPPING.copy()
-    for group in extensions:
+    for group in _extension_groups():
         processors |= group["extensions"]
 
     for extension, config in expanded.items():
         processor = processors[extension]
         if isinstance(processor, str):
-            processors[extension] = import_string(extension)
+            processor = processors[extension] = import_string(processor)
         processor(config, nh3_config)
 
     # nh3 panics when a tag's class attribute is both allowed outright and

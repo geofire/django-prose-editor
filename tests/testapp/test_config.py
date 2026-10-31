@@ -10,7 +10,7 @@ from django_prose_editor.config import (
     html_tags,
     js_from_extensions,
 )
-from django_prose_editor.fields import create_sanitizer
+from django_prose_editor.fields import ProseEditorField, create_sanitizer
 
 
 class ConfigFunctionsTestCase(TestCase):
@@ -282,3 +282,42 @@ class ConfigFunctionsTestCase(TestCase):
         for extensions in [{"Image": True}, {"Figure": True}]:
             sanitize = create_sanitizer(extensions)
             assert 'data-file="42"' in sanitize(html)
+
+    def test_allowlist_from_extensions_returns_nh3_config(self):
+        """The allowlist must be a dict of nh3 keyword arguments, not a list
+        of JavaScript modules."""
+        allowlist = allowlist_from_extensions({"Bold": True})
+
+        assert isinstance(allowlist, dict)
+        assert isinstance(allowlist["tags"], set)
+        assert isinstance(allowlist["attributes"], dict)
+        # Core extensions are processed too
+        assert {"p", "strong"} <= allowlist["tags"]
+
+    def test_allowlist_from_extensions_with_builtin_group(self):
+        """Extensions from built-in groups contribute to the allowlist."""
+        allowlist = allowlist_from_extensions({"CodeBlockLowlight": True})
+
+        assert isinstance(allowlist, dict)
+        assert {"pre", "code"} <= allowlist["tags"]
+        assert "class" in allowlist["attributes"]["code"]
+
+    def test_field_with_sanitize_true(self):
+        """Defining a field with sanitize=True must not crash and must
+        actually sanitize."""
+        field = ProseEditorField(
+            config={"extensions": {"Bold": True, "Italic": True}},
+            sanitize=True,
+        )
+
+        assert (
+            field.sanitize("<p><strong>a</strong><u>b</u></p><script>x</script>")
+            == "<p><strong>a</strong>b</p>"
+        )
+
+    def test_js_from_extensions_includes_builtin_groups(self):
+        """Built-in extension groups ship their own JavaScript modules."""
+        assert js_from_extensions({"CodeBlockLowlight": True}) == [
+            "django-prose-editor/codeblocklowlight"
+        ]
+        assert js_from_extensions({"CodeBlock": True}) == []
