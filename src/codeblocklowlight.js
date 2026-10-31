@@ -1,5 +1,9 @@
 import { CodeBlockLowlight as BaseCodeBlockLowlight } from "@tiptap/extension-code-block-lowlight"
-import { gettext, updateAttrsDialog } from "django-prose-editor/editor"
+import {
+  gettext,
+  mergeAttributes,
+  updateAttrsDialog,
+} from "django-prose-editor/editor"
 import { common, createLowlight } from "lowlight"
 
 let sharedLowlight = null
@@ -10,6 +14,31 @@ const defaultLowlight = () => {
   return sharedLowlight
 }
 
+// Convert lowlight's hast nodes into a ProseMirror DOMOutputSpec
+const hastToDOMSpec = (nodes) =>
+  nodes.map((node) =>
+    node.type === "element"
+      ? [
+          "span",
+          { class: node.properties?.className?.join(" ") || null },
+          ...hastToDOMSpec(node.children || []),
+        ]
+      : node.value || "",
+  )
+
+const highlightTokens = (lowlight, language, code) => {
+  try {
+    const tree =
+      language && lowlight.registered?.(language)
+        ? lowlight.highlight(language, code)
+        : lowlight.highlightAuto(code)
+    return hastToDOMSpec(tree.children)
+  } catch (error) {
+    console.error("CodeBlockLowlight: highlighting failed", error)
+    return [code]
+  }
+}
+
 export const CodeBlockLowlight = BaseCodeBlockLowlight.extend({
   addOptions() {
     return {
@@ -18,6 +47,52 @@ export const CodeBlockLowlight = BaseCodeBlockLowlight.extend({
       // Optional list of language names offered in the language dialog,
       // defaults to all languages registered with lowlight.
       languages: null,
+    }
+  },
+
+  // Used for the serialized HTML (getHTML(), clipboard). Bakes the syntax
+  // highlighting into the output so that highlight.js themes work on the
+  // frontend without running highlight.js there.
+  renderHTML({ node, HTMLAttributes }) {
+    const { lowlight, languageClassPrefix, defaultLanguage } = this.options
+    const language = node.attrs.language || defaultLanguage
+    const classes = ["hljs"]
+    if (node.attrs.language) {
+      classes.push(`${languageClassPrefix}${node.attrs.language}`)
+    }
+    return [
+      "pre",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      [
+        "code",
+        { class: classes.join(" ") },
+        ...highlightTokens(lowlight, language, node.textContent),
+      ],
+    ]
+  },
+
+  // renderHTML above has no content hole, so the editor needs its own
+  // editable DOM. Highlighting inside the editor is done by decorations.
+  addNodeView() {
+    const options = this.options
+    return ({ node, HTMLAttributes }) => {
+      const dom = document.createElement("pre")
+      const attrs = mergeAttributes(options.HTMLAttributes, HTMLAttributes)
+      for (const [name, value] of Object.entries(attrs)) {
+        if (value != null) dom.setAttribute(name, value)
+      }
+      const contentDOM = document.createElement("code")
+      if (node.attrs.language) {
+        contentDOM.className = `${options.languageClassPrefix}${node.attrs.language}`
+      }
+      dom.append(contentDOM)
+
+      return {
+        dom,
+        contentDOM,
+        // Recreate the node view when attributes (e.g. language) change
+        update: (updatedNode) => updatedNode.hasMarkup(node.type, node.attrs),
+      }
     }
   },
 

@@ -126,10 +126,15 @@ def process_code_block(config, shared_config):
 def process_code_block_lowlight(config, shared_config):
     """Process CodeBlockLowlight extension configuration.
 
-    The syntax highlighting only exists as editor decorations; the saved HTML
-    is ``<pre><code class="language-xyz">``.
+    The saved HTML contains the syntax highlighting as highlight.js compatible
+    markup: ``<pre><code class="hljs language-xyz"><span class="hljs-keyword">``
+    so that any highlight.js theme can be used on the frontend.
     """
-    add_tags_and_attributes(shared_config, ["pre", "code"], {"code": ["class"]})
+    add_tags_and_attributes(
+        shared_config,
+        ["pre", "code", "span"],
+        {"code": ["class"], "span": ["class"]},
+    )
 
 
 def process_figure(config, shared_config):

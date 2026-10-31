@@ -13,5 +13,6 @@ def test_codeblocklowlight_js_module():
 
 def test_codeblocklowlight_allowlist():
     config = allowlist_from_extensions({"CodeBlockLowlight": True})
-    assert {"pre", "code"} <= config["tags"]
+    assert {"pre", "code", "span"} <= config["tags"]
     assert "class" in config["attributes"]["code"]
+    assert "class" in config["attributes"]["span"]
