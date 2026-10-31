@@ -267,7 +267,7 @@ A list of supported languages can be found here: https://github.com/wooorm/lowli
 
     content = ProseEditorField(
         extensions={
-            "CodeBlockLowLight": True,
+            "CodeBlockLowlight": True,
         }
     )
 
@@ -276,7 +276,7 @@ A list of supported languages can be found here: https://github.com/wooorm/lowli
 
     content = ProseEditorField(
         extensions={
-            "CodeBlockLowLight": {
+            "CodeBlockLowlight": {
               "defaultLanguage": "python",
               "languages": ["python", "javascript", "css"]
             },
