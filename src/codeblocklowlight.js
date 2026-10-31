@@ -55,7 +55,9 @@ export const CodeBlockLowlight = BaseCodeBlockLowlight.extend({
               editor
                 .chain()
                 .focus()
-                .updateAttributes(nodeName, { language: attrs.language || null })
+                .updateAttributes(nodeName, {
+                  language: attrs.language || null,
+                })
                 .run()
             }
           })
