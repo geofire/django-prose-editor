@@ -27,6 +27,8 @@ export const CodeBlockLowlight = BaseCodeBlockLowlight.extend({
 
     const { menu, buttons } = args
     const { lowlight, languages } = this.options
+    // Read the node name here; the menu calls command() without `this`
+    const nodeName = this.name
     const choices = ["", ...(languages || lowlight.listLanguages()).toSorted()]
 
     const languageDialog = updateAttrsDialog(
@@ -45,21 +47,24 @@ export const CodeBlockLowlight = BaseCodeBlockLowlight.extend({
       name: "codeBlockLanguage",
       groups: "nodes",
       button: buttons.material("data_object", gettext("Code block language")),
-      async command(editor) {
-        const current = editor.getAttributes(this.name || "codeBlock")
-        const attrs = await languageDialog(editor, {
-          language: current.language || "",
-        })
-        if (attrs) {
-          editor
-            .chain()
-            .focus()
-            .updateAttributes("codeBlock", { language: attrs.language || null })
-            .run()
-        }
+      command(editor) {
+        const current = editor.getAttributes(nodeName)
+        languageDialog(editor, { language: current.language || "" })
+          .then((attrs) => {
+            if (attrs) {
+              editor
+                .chain()
+                .focus()
+                .updateAttributes(nodeName, { language: attrs.language || null })
+                .run()
+            }
+          })
+          .catch((error) => {
+            console.error("CodeBlockLowlight: language dialog failed", error)
+          })
       },
       hidden(editor) {
-        return !editor.isActive("codeBlock")
+        return !editor.isActive(nodeName)
       },
     })
   },
