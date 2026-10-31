@@ -1,10 +1,12 @@
 import { promises as fs } from "node:fs"
 import { createRequire } from "node:module"
 import { join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { defineConfig } from "@rslib/core"
 
 const require = createRequire(import.meta.url)
 const isProduction = process.env.NODE_ENV === "production"
+const local = (path) => fileURLToPath(new URL(path, import.meta.url))
 
 async function removeRuntimeOnlyFiles(distPath) {
   try {
@@ -83,6 +85,31 @@ export default defineConfig({
           "django-prose-editor/editor": "module django-prose-editor/editor",
         },
         chunkLoading: "import",
+      },
+    },
+    // Optional extensions, loaded on demand by the configurable preset
+    {
+      ...commonConfig,
+      source: {
+        entry: {
+          codeblocklowlight: "./src/codeblocklowlight.js",
+        },
+      },
+      resolve: {
+        alias: {
+          "@tiptap/extension-code-block$": local(
+            "./src/shims/extension-code-block.js",
+          ),
+          "@tiptap/pm/state$": local("./src/shims/pm-state.js"),
+          "@tiptap/pm/view$": local("./src/shims/pm-view.js"),
+        },
+      },
+      output: {
+        ...commonConfig.output,
+        externals: {
+          "django-prose-editor/editor": "module django-prose-editor/editor",
+          "@tiptap/core": "module django-prose-editor/editor",
+        },
       },
     },
   ],

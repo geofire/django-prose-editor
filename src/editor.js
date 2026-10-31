@@ -2,6 +2,7 @@ import "./editor.css"
 import "./dialog.css"
 import "./fullscreen.css"
 import "./menu.css"
+import "./codeblocklowlight.css"
 
 export * from "@tiptap/core"
 export { Blockquote } from "@tiptap/extension-blockquote"

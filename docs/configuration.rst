@@ -246,3 +246,39 @@ The attribute is removed when the image URL is changed by hand afterwards, so
 it never refers to a different file than ``src``. The sanitizer allows
 ``data-file`` on ``img`` when the ``Image`` or ``Figure`` extension is
 enabled.
+
+**Code blocks**
+
+There are two types of code blocks: ```CodeBlock``` which provides a basic
+code block, and ```CodeBlockLowLight``` which includes syntax highlighting.
+Note, do not use both of these extensions at the same time as it can cause conflicts.
+
+A list of supported languages can be found here: https://github.com/wooorm/lowlight#data
+
+.. code-block:: python
+
+    content = ProseEditorField(
+        extensions={
+            "CodeBlock": True,
+        }
+    )
+
+.. code-block:: python
+
+    content = ProseEditorField(
+        extensions={
+            "CodeBlockLowLight": True,
+        }
+    )
+
+
+.. code-block:: python
+
+    content = ProseEditorField(
+        extensions={
+            "CodeBlockLowLight": {
+              "defaultLanguage": "python",
+              "languages": ["python", "javascript", "css"]
+            },
+        }
+    )

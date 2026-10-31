@@ -1,0 +1,108 @@
+.prose-editor .ProseMirror pre {
+  --_hl-comment: var(--prose-editor-hl-comment, #6a737d);
+  --_hl-keyword: var(--prose-editor-hl-keyword, #d73a49);
+  --_hl-string: var(--prose-editor-hl-string, #032f62);
+  --_hl-number: var(--prose-editor-hl-number, #005cc5);
+  --_hl-title: var(--prose-editor-hl-title, #6f42c1);
+  --_hl-tag: var(--prose-editor-hl-tag, #22863a);
+  --_hl-attr: var(--prose-editor-hl-attr, #005cc5);
+  --_hl-meta: var(--prose-editor-hl-meta, #e36209);
+  --_hl-deletion-bg: var(--prose-editor-hl-deletion-bg, #ffeef0);
+  --_hl-addition-bg: var(--prose-editor-hl-addition-bg, #f0fff4);
+
+  padding: 0.75em 1em;
+  border-radius: 4px;
+  background: var(--prose-editor-code-background, rgba(127, 127, 127, 0.1));
+  overflow-x: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose-editor .ProseMirror pre {
+    --_hl-comment: var(--prose-editor-hl-comment, #8b949e);
+    --_hl-keyword: var(--prose-editor-hl-keyword, #ff7b72);
+    --_hl-string: var(--prose-editor-hl-string, #a5d6ff);
+    --_hl-number: var(--prose-editor-hl-number, #79c0ff);
+    --_hl-title: var(--prose-editor-hl-title, #d2a8ff);
+    --_hl-tag: var(--prose-editor-hl-tag, #7ee787);
+    --_hl-attr: var(--prose-editor-hl-attr, #79c0ff);
+    --_hl-meta: var(--prose-editor-hl-meta, #ffa657);
+    --_hl-deletion-bg: var(--prose-editor-hl-deletion-bg, #490202);
+    --_hl-addition-bg: var(--prose-editor-hl-addition-bg, #04260f);
+  }
+}
+
+.prose-editor .ProseMirror pre code {
+  background: none;
+  padding: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prose-editor .ProseMirror pre .hljs-comment,
+.prose-editor .ProseMirror pre .hljs-quote {
+  color: var(--_hl-comment);
+  font-style: italic;
+}
+
+.prose-editor .ProseMirror pre .hljs-keyword,
+.prose-editor .ProseMirror pre .hljs-selector-tag,
+.prose-editor .ProseMirror pre .hljs-type,
+.prose-editor .ProseMirror pre .hljs-doctag {
+  color: var(--_hl-keyword);
+}
+
+.prose-editor .ProseMirror pre .hljs-string,
+.prose-editor .ProseMirror pre .hljs-regexp,
+.prose-editor .ProseMirror pre .hljs-char.escape_ {
+  color: var(--_hl-string);
+}
+
+.prose-editor .ProseMirror pre .hljs-number,
+.prose-editor .ProseMirror pre .hljs-literal,
+.prose-editor .ProseMirror pre .hljs-variable,
+.prose-editor .ProseMirror pre .hljs-template-variable,
+.prose-editor .ProseMirror pre .hljs-built_in {
+  color: var(--_hl-number);
+}
+
+.prose-editor .ProseMirror pre .hljs-title,
+.prose-editor .ProseMirror pre .hljs-section,
+.prose-editor .ProseMirror pre .hljs-title.function_,
+.prose-editor .ProseMirror pre .hljs-title.class_ {
+  color: var(--_hl-title);
+}
+
+.prose-editor .ProseMirror pre .hljs-name,
+.prose-editor .ProseMirror pre .hljs-tag,
+.prose-editor .ProseMirror pre .hljs-selector-id,
+.prose-editor .ProseMirror pre .hljs-selector-class {
+  color: var(--_hl-tag);
+}
+
+.prose-editor .ProseMirror pre .hljs-attr,
+.prose-editor .ProseMirror pre .hljs-attribute,
+.prose-editor .ProseMirror pre .hljs-property,
+.prose-editor .ProseMirror pre .hljs-symbol {
+  color: var(--_hl-attr);
+}
+
+.prose-editor .ProseMirror pre .hljs-meta,
+.prose-editor .ProseMirror pre .hljs-params,
+.prose-editor .ProseMirror pre .hljs-subst {
+  color: var(--_hl-meta);
+}
+
+.prose-editor .ProseMirror pre .hljs-deletion {
+  background: var(--_hl-deletion-bg);
+}
+
+.prose-editor .ProseMirror pre .hljs-addition {
+  background: var(--_hl-addition-bg);
+}
+
+.prose-editor .ProseMirror pre .hljs-emphasis {
+  font-style: italic;
+}
+
+.prose-editor .ProseMirror pre .hljs-strong {
+  font-weight: bold;
+}

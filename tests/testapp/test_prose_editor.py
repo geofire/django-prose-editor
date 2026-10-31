@@ -58,6 +58,7 @@ class Test(test.TestCase):
         )
 
     def test_utilities(self):
+        # TODO: Update so codeblocklowlight is included (out of date test)
         assert (
             str(prose_editor_media())
             == """\
